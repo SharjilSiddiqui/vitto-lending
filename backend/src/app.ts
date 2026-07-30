@@ -5,7 +5,7 @@ import { swaggerSpec } from "./config/swagger.js";
 import { apiRoutes } from "./routes/index.js";
 import { applySecurity } from "./middleware/security.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
-
+//
 export function createApp() {
   const app = express();
 
