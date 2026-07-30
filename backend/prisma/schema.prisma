@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Business {
+  id             String            @id @default(cuid())
+  ownerName      String
+  pan            String            @unique
+  businessType   BusinessType
+  monthlyRevenue Decimal           @db.Decimal(14, 2)
+  createdAt      DateTime          @default(now())
+  loans          LoanApplication[]
+}
+
+model LoanApplication {
+  id           String     @id @default(cuid())
+  businessId   String
+  loanAmount   Decimal    @db.Decimal(14, 2)
+  tenureMonths Int
+  purpose      String
+  createdAt    DateTime   @default(now())
+  decisions    Decision[]
+  business     Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+}
+
+model Decision {
+  id          String          @id @default(cuid())
+  loanId      String
+  creditScore Int
+  decision    DecisionStatus
+  reasonCodes String[]
+  createdAt   DateTime        @default(now())
+  loan        LoanApplication @relation(fields: [loanId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  request   Json
+  decision  String
+  score     Int
+  ip        String
+  createdAt DateTime @default(now())
+}
+
+enum BusinessType {
+  RETAIL
+  MANUFACTURING
+  SERVICES
+  HEALTHCARE
+  TECHNOLOGY
+  EDUCATION
+  AGRICULTURE
+}
+
+enum DecisionStatus {
+  APPROVED
+  REJECTED
+}

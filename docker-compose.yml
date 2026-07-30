@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: vitto
+      POSTGRES_PASSWORD: vitto
+      POSTGRES_DB: vitto_lending
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: postgresql://vitto:vitto@postgres:5432/vitto_lending?schema=public
+      FRONTEND_ORIGIN: http://localhost:5173
+      PORT: 4000
+      NODE_ENV: production
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres-data:
