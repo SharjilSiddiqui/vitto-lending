@@ -8,16 +8,24 @@ export function applySecurity(app: Express): void {
   app.use(helmet());
   app.use(
     cors({
-      origin: env.FRONTEND_ORIGIN,
-      credentials: true
-    })
+      origin(origin, callback) {
+        const allowed = [env.FRONTEND_ORIGIN.replace(/\/$/, "")];
+
+        if (!origin || allowed.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
+      credentials: true,
+    }),
   );
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000,
       limit: 100,
       standardHeaders: true,
-      legacyHeaders: false
-    })
+      legacyHeaders: false,
+    }),
   );
 }
